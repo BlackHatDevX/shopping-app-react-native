@@ -7,18 +7,50 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const navigation = useNavigation();
+  const handleRegister = () => {
+    const user = {
+      name: name,
+      email: email,
+      password: password,
+    };
+
+    // send a post request to the backend
+    axios
+      .post("http://localhost:8000/register", user)
+      .then((response) => {
+        console.log(response);
+        Alert.alert(
+          "Registration successful",
+          "You have registered Successfully"
+        );
+        setName("");
+        setPassword("");
+        setPassword("");
+      })
+      .catch((error) => {
+        Alert.alert(
+          "Registration error",
+          "an error occurred during registration"
+        );
+        console.log("====================================");
+        console.log("registration failed", error);
+        console.log("====================================");
+      });
+  };
   return (
     <SafeAreaView
       style={{
@@ -164,6 +196,7 @@ const RegisterScreen = () => {
         </View>
         <View style={{ marginTop: 80 }} />
         <Pressable
+          onPress={handleRegister}
           style={{
             width: 200,
             backgroundColor: "#FEBE10",
@@ -176,7 +209,7 @@ const RegisterScreen = () => {
           <Text
             style={{ textAlign: "center", color: "white", fontWeight: "bold" }}
           >
-            Login
+            Register
           </Text>
         </Pressable>
         <Pressable
