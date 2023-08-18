@@ -28,29 +28,39 @@ const RegisterScreen = () => {
       password: password,
     };
 
-    // send a post request to the backend
     axios
-      .post("http://localhost:8000/register", user)
+      .post("http://192.168.38.179:8000/register", user)
       .then((response) => {
         console.log(response);
         Alert.alert(
           "Registration successful",
-          "You have registered Successfully"
+          "You have registered successfully"
         );
         setName("");
-        setPassword("");
+        setEmail("");
         setPassword("");
       })
       .catch((error) => {
-        Alert.alert(
-          "Registration error",
-          "an error occurred during registration"
-        );
-        console.log("====================================");
-        console.log("registration failed", error);
-        console.log("====================================");
+        if (error.response) {
+          if (error.response.status === 400 && error.response.data.message) {
+            // Email already registered
+            Alert.alert("Registration error", error.response.data.message);
+          } else {
+            Alert.alert(
+              "Registration error",
+              "An error occurred during registration"
+            );
+          }
+        } else {
+          Alert.alert(
+            "Network error",
+            "Please check your network connection and try again"
+          );
+        }
+        console.log("Registration failed", error);
       });
   };
+
   return (
     <SafeAreaView
       style={{

@@ -39,9 +39,12 @@ const sendVerificationEmail = async (email, verificationToken) => {
   //create a nodemailer transport
   const transporter = nodemailer.createTransport({
     //configure the email service
+
     service: "gmail",
     auth: {
+      //enter your gmail id below
       user: "",
+      // enter your app password below
       pass: "",
     },
   });
@@ -52,7 +55,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
     to: email,
     subject: "Email Verification",
     text:
-      "Please click the following link to verify your email : http://localhost:8000/verify/" +
+      "Please click the following link to verify your email : http://192.168.38.179:8000/verify/" +
       verificationToken,
   };
 
@@ -94,25 +97,23 @@ app.post("/register", async (req, res) => {
 });
 
 //endpoint to verify the email
-app.get("/verify/:token"),
-  async (req, res) => {
-    try {
-      const token = req.params.token;
+app.get("/verify/:token", async (req, res) => {
+  try {
+    const token = req.params.token;
 
-      //mark the user as verified
-      user.verified = true;
-      user.verificationToken = undefined;
-
-      await user.save();
-
-      res.status(200).json({ message: "email verified success" });
-
-      //find the user with the given verification token
-      const user = await User.findOne({ verificationToken: token });
-      if (!user) {
-        return res.status(404).json({ message: "Invalid verification token" });
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Email verification failed" });
+    // Find the user with the given verification token
+    const user = await User.findOne({ verificationToken: token });
+    if (!user) {
+      return res.status(404).json({ message: "Invalid verification token" });
     }
-  };
+
+    // Mark the user as verified
+    user.verified = true;
+    user.verificationToken = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Email verified successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Email verification failed" });
+  }
+});
